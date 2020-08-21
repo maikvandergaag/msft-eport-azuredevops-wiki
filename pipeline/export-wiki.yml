@@ -1,0 +1,50 @@
+trigger:
+  - master
+
+variables:
+  - group: git-information
+  - name: pandoc-installation
+    value: "https://github.com/jgm/pandoc/releases/download/2.10.1/pandoc-2.10.1-1-amd64.deb"
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - bash: |
+      sudo apt-get -qq update
+      wget $(pandoc-installation) -O $HOME/pandoc.deb
+      sudo dpkg -i $HOME/pandoc.deb
+    displayName: Install pandoc
+  - task: PowerShell@2
+    displayName: Clone wiki files
+    inputs:
+      filePath: "$(System.DefaultWorkingDirectory)/scripts/clone-git-repo.ps1"
+      arguments: "-Repo $(wikirepo) -DevOpsPat $(git-password)"
+      pwsh: true
+  - task: CopyFiles@2
+    displayName: Copy attachments for file generation
+    inputs:
+      SourceFolder: "$(System.DefaultWorkingDirectory)/wiki/.attachments"
+      Contents: "**"
+      TargetFolder: "$(System.DefaultWorkingDirectory)/attachments"
+  - task: PowerShell@2
+    displayName: Generate single page wiki file
+    inputs:
+      filePath: "$(System.DefaultWorkingDirectory)/scripts/singlepage-wiki.ps1"
+      arguments: ""
+      pwsh: true
+  - bash: |
+      pandoc -s $(System.DefaultWorkingDirectory)/wiki/singlepage-wiki.md --lua-filter $(System.DefaultWorkingDirectory)/scripts/pandoc/fixImages.lua -o $(System.DefaultWorkingDirectory)/wiki/wiki.docx
+    displayName: Run pandoc
+  - task: CopyFiles@2
+    displayName: Copy export to artifact staging directory
+    inputs:
+      SourceFolder: "$(System.DefaultWorkingDirectory)/wiki"
+      Contents: "wiki.docx"
+      TargetFolder: "$(build.artifactstagingdirectory)/export"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish - artifacts"
+    inputs:
+      PathtoPublish: "$(Build.ArtifactStagingDirectory)/export"
+      ArtifactName: "export"
+      publishLocation: "Container"
