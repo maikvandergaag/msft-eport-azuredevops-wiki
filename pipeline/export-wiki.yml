@@ -34,7 +34,7 @@ steps:
       arguments: "-FolderName '$(System.DefaultWorkingDirectory)/wiki'"
       pwsh: true
   - bash: |
-      pandoc -s $(System.DefaultWorkingDirectory)/wiki/singlepage-wiki.md --lua-filter $(System.DefaultWorkingDirectory)/scripts/pandoc/fixImages.lua -o $(System.DefaultWorkingDirectory)/wiki/wiki.docx
+      pandoc -s $(System.DefaultWorkingDirectory)/wiki/singlepage-wiki.md --lua-filter $(System.DefaultWorkingDirectory)/scripts/pandoc/pandoc-images.lua -o $(System.DefaultWorkingDirectory)/wiki/wiki.docx
     displayName: Run pandoc
   - task: CopyFiles@2
     displayName: Copy export to artifact staging directory
