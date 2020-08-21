@@ -51,8 +51,8 @@ PROCESS {
             Write-Output "order file does not exits"
         }
     }
-              
-    $path = "$(System.DefaultWorkingDirectory)/$($FolderName)"
+
+    $path = "$($FolderName)"
     if ($path -notmatch '\\$') { $path += '/' }
     
     $resultFile = $path + "singlepage-wiki.md"
