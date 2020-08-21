@@ -8,7 +8,7 @@ Param (
 BEGIN {
     Write-Host "Starting to clone git repository - $($Repo)"
 
-    $folder = "$(System.DefaultWorkingDirectory)/$($FolderName)"    
+    $folder = "$($FolderName)"    
     Write-Host "# Repository will be cloned in: $folder"
 
     $env:GIT_REDIRECT_STDERR = '2>&1'

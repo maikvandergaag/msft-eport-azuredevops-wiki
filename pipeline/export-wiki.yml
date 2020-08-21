@@ -19,7 +19,7 @@ steps:
     displayName: Clone wiki files
     inputs:
       filePath: "$(System.DefaultWorkingDirectory)/scripts/clone-git-repo.ps1"
-      arguments: "-Repo $(wikirepo) -DevOpsPat $(git-password)"
+      arguments: "-Repo '$(wikirepo)' -DevOpsPat '$(git-password)' -FolderName '$(System.DefaultWorkingDirectory)/wiki'"
       pwsh: true
   - task: CopyFiles@2
     displayName: Copy attachments for file generation
@@ -31,7 +31,7 @@ steps:
     displayName: Generate single page wiki file
     inputs:
       filePath: "$(System.DefaultWorkingDirectory)/scripts/singlepage-wiki.ps1"
-      arguments: ""
+      arguments: "-FolderName '$(System.DefaultWorkingDirectory)/wiki'"
       pwsh: true
   - bash: |
       pandoc -s $(System.DefaultWorkingDirectory)/wiki/singlepage-wiki.md --lua-filter $(System.DefaultWorkingDirectory)/scripts/pandoc/fixImages.lua -o $(System.DefaultWorkingDirectory)/wiki/wiki.docx
